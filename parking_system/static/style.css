@@ -119,6 +119,10 @@ html {
     margin-bottom: 1em;
   }
   
+  .content select {
+    margin-bottom: 1em;
+  }
+  
   .content textarea {
     min-height: 12em;
     resize: vertical;

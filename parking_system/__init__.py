@@ -1,6 +1,7 @@
 from os import makedirs
 from flask import Flask
 from parking_system import billboard
+from parking_system import auth
 
 
 def create_app():
@@ -28,6 +29,7 @@ def create_app():
     def hello():
         return "Hello, World!"
 
+    app.register_blueprint(auth.blueprint)
     app.register_blueprint(billboard.blueprint)
 
     return app

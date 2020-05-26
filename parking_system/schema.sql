@@ -21,13 +21,14 @@ CREATE TABLE IF NOT EXISTS `ParkingSpace`(
 #
 CREATE TABLE IF NOT EXISTS `CarOwner`(
     `owner_id` BINARY(16) NOT NULL,
-    `customer_type` VARCHAR(10) NOT NULL,
+    `customer_type` VARCHAR(10),
     `student_employee_code` CHAR(10),
     `discount_rate` DECIMAL(4, 2),
     `first_name` VARCHAR(20),
     `surname` VARCHAR(20),
     `tel_number` CHAR(10),
-    `email` VARCHAR(30),
+    `email` VARCHAR(30) NOT NULL,
+    `password` CHAR(82) NOT NULL,
     `payment_method` VARCHAR(15),
     PRIMARY KEY(`owner_id`)
 );

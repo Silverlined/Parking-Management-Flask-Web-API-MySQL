@@ -9,7 +9,7 @@ blueprint = Blueprint("billboard", __name__, url_prefix="/billboard")
 
 
 @blueprint.route("/info", methods=(["GET"]))
-def get_parking_spaces_per_lot():
+def get_parking_spaces_info():
     """Gets information about the parking lots in terms of parking spaces
 
         Returns
@@ -28,7 +28,7 @@ def get_parking_spaces_per_lot():
 
     is_occupied_field = request.args.get("is_occupied")
     if is_occupied_field is None:
-        is_occupied_field = 0
+        is_occupied_field = "0"
     connection_object = get_db("billboard")
     cursor = connection_object.cursor(named_tuple=True)
     select_query = """SELECT name,
@@ -53,7 +53,6 @@ def get_parking_spaces_per_lot():
             is_occupied_arg=is_occupied_field,
         )
     except Error as err:
-        connection_object.rollback()
         print("Error Code:", err.errno)
         print("SQLSTATE:", err.sqlstate)
         print("Message:", err.msg)

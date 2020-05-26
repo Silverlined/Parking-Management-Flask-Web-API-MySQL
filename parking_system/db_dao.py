@@ -44,22 +44,22 @@ def close_db(e=None):
         db_connection.close()
 
 
-def init_db():
+def create_tables():
     db = get_db("admin")
 
     with current_app.open_resource("schema.sql") as f:
         db.executescript(f.read().decode("utf8"))
 
 
-@click.command("init-db")
+@click.command("create-tables")
 @with_appcontext
-def init_db_command():
+def create_tables_command():
     """Create database tables"""
 
-    init_db()
+    create_tables()
     click.echo("Initialized the database.")
 
 
 def init_app(app):
     app.teardown_appcontext(close_db)
-    app.cli.add_command(init_db_command)
+    app.cli.add_command(create_tables_command)
