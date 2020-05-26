@@ -1,24 +1,24 @@
 # Parking Management API
-
-## 1. Application Setup
+## Introduction
+Zernike Facilities is in the process of building a new parkinglot - P7. P7 will be ticketless and will keep track of which parking places are available/occupied. This inspired management to order the creation of a new parking app and to upgrade the old parking lots to the new system. As a future engineer you receive the order to develop the new system that will manage the parking lots.
+## Procedure
+---
+## 1. Setup the Application
 `Flask application`
 ## 2. Define and Access the Database
 `The application will use a MySQL database to store any parking related data`
-## 3. Blueprints and Views
+>Note: I will be using the *MySQL connector/Python* as my database API wrapper. `mysql-connector` is an all-in python module supported by MySQL.
+## 3. Create Blueprints and Views
 `A view function is the code you write to respond to requests to your application. Flask uses patterns to match the incoming request URL to the view that should handle it. The view returns data that Flask turns into an outgoing response. Flask can also go the other direction and generate a URL to a view based on its name and arguments.`
+## 4. Use Templates & Static Files
+`The template files will be stored in the templates directory inside the *parking_system* package. Templates are files that contain static data as well as placeholders for dynamic data. A template is rendered with specific data to produce a final document. Flask uses the Jinja template library to render templates.`
 
+### Entity relationship diagram
+<img src=./res/erd.png width=600>
+
+
+## TODO: Finish the readme file accordingly...
 ## Usage
-
-All responses will have the form
-
-```json
-{
-    "data": "Mixed type holding the content of the response",
-    "message": "Description of what happened"
-}
-```
-
-Subsequent response definitions will only detail the expected value of the `data field`
 
 ### List all devices
 

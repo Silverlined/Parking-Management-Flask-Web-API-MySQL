@@ -1,5 +1,6 @@
 from os import makedirs
 from flask import Flask
+from parking_system import billboard
 
 
 def create_app():
@@ -16,7 +17,8 @@ def create_app():
 
     # ensure the instance folder exists
     try:
-        makedirs(app.instance_path)
+        if app.instance_path is None:
+            makedirs(app.instance_path)
     except OSError as error:
         print(error)
         pass
@@ -25,5 +27,7 @@ def create_app():
     @app.route("/hello")
     def hello():
         return "Hello, World!"
+
+    app.register_blueprint(billboard.blueprint)
 
     return app

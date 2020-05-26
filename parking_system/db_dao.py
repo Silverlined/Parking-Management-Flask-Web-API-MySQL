@@ -8,7 +8,7 @@ from json import load
 def read_db_config(filename="dbconfig.json"):
     config_data = None
 
-    with current_app.open_instance_resource(filename, "r") as file:
+    with current_app.open_instance_resource(filename, mode="r") as file:
         config_data = load(file)
 
     return config_data

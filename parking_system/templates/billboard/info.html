@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Billboard{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+{% for parking_lot in lots_info %}
+<h3>{{parking_lot.name}}</h3>
+{% if is_occupied_arg == "0" %}
+<p>
+    {{parking_lot.non_charging}} non-charging and {{parking_lot.charging}} charging spaces are <b>free</b>.
+</p>
+{% elif is_occupied_arg == "1" %}
+<p>
+    {{parking_lot.non_charging}} non-charging and {{parking_lot.charging}} charging spaces are <b>occupied</b>.
+</p>
+{% endif %}
+{% endfor %}
+{% endblock %}
