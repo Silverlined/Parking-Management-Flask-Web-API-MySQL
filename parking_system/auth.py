@@ -136,7 +136,6 @@ def login():
         password = request.form["password"]
         connection_object = get_db("zernike_parking_app")
         error = None
-        user = None
         verify_email_query = """SELECT EXISTS(SELECT email FROM CarOwner WHERE email=%s) AS is_registered"""
         get_pass_hash_query = """SELECT password FROM CarOwner WHERE email=%s"""
 
@@ -153,11 +152,12 @@ def login():
 
             if error is None:
                 cursor.execute(
-                    "SELECT * FROM CarOwner WHERE email=%s ", (email,)
+                    "SELECT BIN_TO_UUID(owner_id) AS owner_id FROM CarOwner WHERE email=%s ",
+                    (email,),
                 )
-                user = cursor.fetchone()
+                user_id = cursor.fetchone().owner_id
                 session.clear()
-                session["user_id"] = UUID(bytes=user.owner_id)
+                session["user_id"] = user_id
                 return redirect(url_for("billboard.get_parking_spaces_info"))
 
         except Error as err:
@@ -165,6 +165,8 @@ def login():
             print("Error Code:", err.errno)
             print("SQLSTATE:", err.sqlstate)
             print("Message:", err.msg)
+        except ValueError as err:
+            print("login failure: ", err)
         finally:
             cursor.close()
             if error is not None:
