@@ -12,9 +12,10 @@
     <input type="password" name="password" id="password" required>
     <label for="customer_type">Customer type:</label>
     <select id="customer_type" name="customer_type">
+        <option></option>
         <option value="RUG">Employee at RUG</option>
         <option value="Hanze">Employee at Hanze</option>
-        <option value="Student">Student</option>
+        <option value="student">Student</option>
     </select>
     <label for="student_employee_code">Student/Employee Code:</label>
     <input name="student_employee_code" id="student_employee_code">
@@ -26,8 +27,8 @@
     <input name="tel_number" id="tel_number">
     <label for="payment_method">Payment method:</label>
     <select id="payment_method" name="payment_method">
-        <option value="direct_debit">Direct Debit</option>
         <option value="manual_payment">Manual payment</option>
+        <option value="direct_debit">Direct Debit</option>
     </select>
     <input type="submit" value="Register">
 </form>

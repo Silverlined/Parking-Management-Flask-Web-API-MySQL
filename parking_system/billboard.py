@@ -1,5 +1,3 @@
-from collections import namedtuple
-
 from mysql.connector import MySQLConnection, Error
 from flask import Blueprint, flash, render_template, request, url_for
 from parking_system.db_dao import get_db

@@ -2,6 +2,9 @@ from os import makedirs
 from flask import Flask
 from parking_system import billboard
 from parking_system import auth
+from parking_system import db_dao
+from markdown import markdown
+import os
 
 
 def create_app():
@@ -12,11 +15,10 @@ def create_app():
             * Tells Python that the "parking_system" directory should be treated as a package
     """
 
-    # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(SECRET_KEY="dev")
+    app.secret_key = "dev"
 
-    # ensure the instance folder exists
+    # Ensure the instance folder exists
     try:
         if app.instance_path is None:
             makedirs(app.instance_path)
@@ -24,11 +26,17 @@ def create_app():
         print(error)
         pass
 
-    # a simple page that says hello
-    @app.route("/hello")
-    def hello():
-        return "Hello, World!"
+    @app.route("/")
+    def index():
+        """Present the project documentation"""
 
+        with open(
+            os.path.dirname(app.root_path) + "/README.md", "r"
+        ) as markdown_file:
+            content = markdown_file.read()
+            return markdown(content)
+
+    db_dao.init_app(app)
     app.register_blueprint(auth.blueprint)
     app.register_blueprint(billboard.blueprint)
 

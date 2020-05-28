@@ -39,18 +39,18 @@ CREATE TABLE IF NOT EXISTS `Car`(
     `brand_name` VARCHAR(20),
     `fuel_type` VARCHAR(10),
     PRIMARY KEY(`license_plate`),
-    FOREIGN KEY(`owner_id`) REFERENCES CarOwner(`owner_id`)
+    CONSTRAINT
+    FOREIGN KEY(`owner_id`) REFERENCES CarOwner(`owner_id`) ON UPDATE CASCADE ON DELETE SET NULL
 );
 #
 CREATE TABLE IF NOT EXISTS `CarRecord`(
     `record_id` BINARY(16) NOT NULL,
     `license_plate` VARCHAR(10) NOT NULL,
-    `space_id` SMALLINT UNSIGNED NOT NULL,
+    `space_id` SMALLINT UNSIGNED,
     `check_in` DATETIME NOT NULL,
     `check_out` DATETIME,
-    `total_price` DECIMAL(5, 2),
     `is_paid` BIT NOT NULL,
     PRIMARY KEY(`record_id`),
-    FOREIGN KEY(`license_plate`) REFERENCES Car(`license_plate`),
-    FOREIGN KEY(`space_id`) REFERENCES ParkingSpace(`space_id`)
+    CONSTRAINT `CarRecord_ibfk_1` FOREIGN KEY (`license_plate`) REFERENCES `Car` (`license_plate`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `CarRecord_ibfk_2` FOREIGN KEY (`space_id`) REFERENCES `ParkingSpace` (`space_id`)
 );

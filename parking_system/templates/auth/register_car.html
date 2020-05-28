@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Register a Car{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+    <label for="license_plate">License plate:</label>
+    <input name="license_plate" id="license_plate" required>
+    <label for="brand_name">Car brand:</label>
+    <select name="brand_name" id="brand_name">
+        <option></option>
+        <option>BMW</option>
+        <option>Daewoo</option>
+        <option>Ford</option>
+        <option>Holden</option>
+        <option>Honda</option>
+        <option>Hyundai</option>
+        <option>Isuzu</option>
+        <option>Kia</option>
+        <option>Lexus</option>
+        <option>Mazda</option>
+        <option>Mitsubishi</option>
+        <option>Nissan</option>
+        <option>Peugeot</option>
+        <option>Subaru</option>
+        <option>Suzuki</option>
+        <option>Toyota</option>
+        <option>Volkswagen</option>
+    </select>
+    <label for="fuel_type">Fuel type:</label>
+    <select name="fuel_type" id="fuel_type">
+        <option></option>
+        <option>Gasoline</option>
+        <option>Diesel</option>
+        <option>Electric</option>
+        <option>Hydrogen</option>
+    </select>
+    <input type="submit" value="Register your car">
+</form>
+{% endblock %}

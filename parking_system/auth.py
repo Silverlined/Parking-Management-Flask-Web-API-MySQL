@@ -1,6 +1,5 @@
 import functools
-from collections import namedtuple
-from uuid import uuid1, UUID
+from uuid import uuid1
 from mysql.connector import MySQLConnection, Error
 from passlib.hash import sha256_crypt
 import re
@@ -21,7 +20,9 @@ blueprint = Blueprint("auth", __name__, url_prefix="/auth")
 
 @blueprint.route("/register", methods=(["GET", "POST"]))
 def register():
-    if request.method == "POST":
+    if request.method == "GET":
+        return render_template("auth/register.html")
+    elif request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
         customer_type = request.form["customer_type"]
@@ -79,55 +80,6 @@ def register():
             if error is not None:
                 flash(error)
 
-    return render_template("auth/register.html")
-
-
-@blueprint.route("/register-car", methods=(["GET", "POST"]))
-def register_car():
-    # if g.user is None:
-    #     return redirect(url_for("auth.login"))
-    if request.method == "POST":
-        owner_id = g.user.owner_id
-
-        license_plate = request.form["license_plate"]
-        brand_name = request.form["brand_name"]
-        fuel_type = request.form["fuel_type"]
-        connection_object = get_db("zernike_parking_app")
-        error = None
-
-        cursor = connection_object.cursor(named_tuple=True)
-        duplication_check_query = """SELECT EXISTS(SELECT license_plate FROM Car WHERE license_plate =%s) AS isRegistered"""
-        insert_query = """INSERT INTO Car (license_plate, owner_id, brand_name, fuel_type) VALUES (%s,%s,%s,%s)"""
-
-        try:
-            error = validate_car_data(license_plate, brand_name, fuel_type)
-            cursor.execute(duplication_check_query, (license_plate,))
-            if cursor.fetchone().isRegistered == 1:
-                error = (
-                    "Already registered car with this license plate (%s)."
-                    % license_plate
-                )
-
-            if error is None:
-                cursor.execute(
-                    insert_query,
-                    (license_plate, owner_id, brand_name, fuel_type),
-                )
-                connection_object.commit()
-                return redirect(url_for("billboard.get_parking_spaces_info"))
-
-        except Error as err:
-            connection_object.rollback()
-            print("Error Code:", err.errno)
-            print("SQLSTATE:", err.sqlstate)
-            print("Message:", err.msg)
-        finally:
-            cursor.close()
-            if error is not None:
-                flash(error)
-
-    return render_template("auth/register_car.html")
-
 
 @blueprint.route("/login", methods=(["GET", "POST"]))
 def login():
@@ -174,11 +126,9 @@ def login():
     return render_template("auth/login.html")
 
 
-# TODO: Fix UUID check
 @blueprint.before_app_request
 def load_logged_in_user():
     user_id = session.get("user_id")
-    print(user_id)
     if user_id is None:
         g.user = None
     else:
@@ -239,20 +189,4 @@ def validate_user_data(
     ):
         error = "Please Enter Your Tel. Number"
         return error
-    return None
-
-
-def validate_car_data(license_plate, brand_name, fuel_type):
-    if not re.match(r"^[A-Z]{1,3}[A-Z]{1,2}[0-9]{1,4}$", license_plate):
-        error = "Please Enter A Valid License Plate\ne.g. AAABB1234"
-        return error
-
-    if not re.match(r"[a-zA-Z\s]{0,20}$", brand_name):
-        error = "Please enter car brand"
-        return error
-
-    if not re.match(r"[a-zA-Z\s]{0,10}$", fuel_type):
-        error = "Please enter car fuel type"
-        return error
-
     return None

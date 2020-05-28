@@ -5,7 +5,8 @@
     <h1>Parking System</h1>
     <ul>
         {% if g.user %}
-        <li><span>{{ g.user["user_id"] }}</span>
+
+        <li><span style="color:lightslategrey">Hello, {{ g.user.first_name }}</span>
         <li><a href="{{ url_for('auth.register_car') }}">Register a Car</a>
         <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
             {% else %}

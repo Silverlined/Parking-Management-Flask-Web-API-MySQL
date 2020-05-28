@@ -9,15 +9,10 @@ Zernike Facilities is in the process of building a new parkinglot - P7. P7 will 
 `The application will use a MySQL database to store any parking related data`
 >Note: I will be using the *MySQL connector/Python* as my database API wrapper. `mysql-connector` is an all-in python module supported by MySQL.
 ## 3. Create Blueprints and Views
-`A view function is the code you write to respond to requests to your application. Flask uses patterns to match the incoming request URL to the view that should handle it. The view returns data that Flask turns into an outgoing response. Flask can also go the other direction and generate a URL to a view based on its name and arguments.`
+`A Blueprint is a way to organize a group of related views and other code. Rather than registering views and other code directly with an application, they are registered with a blueprint. Then the blueprint is registered with the application when it is available in the factory function. A view function is the code you write to respond to requests to your application. Flask uses patterns to match the incoming request URL to the view that should handle it. The view returns data that Flask turns into an outgoing response. Flask can also go the other direction and generate a URL to a view based on its name and arguments.`
 ## 4. Use Templates & Static Files
 `The template files will be stored in the templates directory inside the *parking_system* package. Templates are files that contain static data as well as placeholders for dynamic data. A template is rendered with specific data to produce a final document. Flask uses the Jinja template library to render templates.`
 
-### Entity relationship diagram
-<img src=./res/erd.png width=600>
-
-
-## TODO: Finish the readme file accordingly...
 ## Usage
 
 ### List all devices
