@@ -1,11 +1,22 @@
 from os import makedirs
 from flask import Flask
-from parking_system import auth
-from parking_system import users
-from parking_system import billboard
-from parking_system import db_dao
+from parking_system import auth, users, billboard, ticket_booth, db_dao
 from markdown import markdown
 import os
+
+
+def init_app(app):
+    """Register the `close_db` and `create_tables_command` functions with the application instance."""
+
+    app.register_blueprint(auth.blueprint)
+    app.register_blueprint(users.blueprint)
+    app.register_blueprint(ticket_booth.blueprint)
+    app.register_blueprint(billboard.blueprint)
+
+    # Tells Flask to call that function when cleaning up after returning the response.
+    app.teardown_appcontext(db_dao.close_db)
+    # Adds a new command that can be called with the flask CLI command.
+    app.cli.add_command(db_dao.create_tables_command)
 
 
 def create_app():
@@ -37,9 +48,6 @@ def create_app():
             content = markdown_file.read()
             return markdown(content)
 
-    db_dao.init_app(app)
-    app.register_blueprint(auth.blueprint)
-    app.register_blueprint(users.blueprint)
-    app.register_blueprint(billboard.blueprint)
+    init_app(app)
 
     return app

@@ -67,12 +67,3 @@ def create_tables_command():
             cursor.close()
 
     click.echo("Initialized the database. Create Tables.")
-
-
-def init_app(app):
-    """Register the `close_db` and `create_tables_command` functions with the application instance."""
-
-    # Tells Flask to call that function when cleaning up after returning the response.
-    app.teardown_appcontext(close_db)
-    # Adds a new command that can be called with the flask CLI command.
-    app.cli.add_command(create_tables_command)

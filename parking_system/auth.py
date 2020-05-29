@@ -149,7 +149,9 @@ def load_logged_in_user():
 
 @blueprint.route("/logout")
 def logout():
-    session.clear()
+    # session.clear()
+    [session.pop(key) for key in list(session.keys()) if key != "_flashes"]
+    flash("Successfully logged out.", "info")
     return redirect(url_for("auth.login"))
 
 

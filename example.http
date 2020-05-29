@@ -1,3 +1,28 @@
-GET http://localhost:5000/hello HTTP/1.1
-###
+### Show documentation - README.md
+GET http://localhost:5000/ HTTP/1.1
+
+### Show billboard information - available/occuppied space
 GET http://localhost:5000/billboard/info?is_occupied=0 HTTP/1.1
+
+###
+POST http://localhost:5000/ticket-booth/register-car HTTP/1.1
+Content-Type: application/json
+
+{
+    "license_plate": "ADCXZ879"
+}
+###
+POST  http://localhost:5000/ticket-booth/check-in-car HTTP/1.1
+Content-Type: application/json
+
+{
+    "license_plate": "ADCXZ879",
+    "space_id": "46"
+}
+###
+POST  http://localhost:5000/ticket-booth/occupy-space HTTP/1.1
+Content-Type: application/json
+
+{
+    "space_id": "46"
+}
