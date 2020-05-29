@@ -1,7 +1,8 @@
 from os import makedirs
 from flask import Flask
-from parking_system import billboard
 from parking_system import auth
+from parking_system import users
+from parking_system import billboard
 from parking_system import db_dao
 from markdown import markdown
 import os
@@ -38,6 +39,7 @@ def create_app():
 
     db_dao.init_app(app)
     app.register_blueprint(auth.blueprint)
+    app.register_blueprint(users.blueprint)
     app.register_blueprint(billboard.blueprint)
 
     return app

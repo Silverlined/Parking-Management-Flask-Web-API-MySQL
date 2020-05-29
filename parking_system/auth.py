@@ -135,7 +135,7 @@ def load_logged_in_user():
         try:
             cursor = get_db("zernike_parking_app").cursor(named_tuple=True)
             cursor.execute(
-                "SELECT * FROM CarOwner WHERE owner_id=UUID_TO_BIN(%s) ",
+                "SELECT * FROM CarOwner WHERE owner_id=UUID_TO_BIN(%s) LIMIT 1",
                 (user_id,),
             )
             g.user = cursor.fetchone()

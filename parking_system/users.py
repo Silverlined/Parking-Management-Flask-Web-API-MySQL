@@ -7,8 +7,12 @@ from flask import (
     url_for,
     g,
     redirect,
+    make_response,
+    jsonify,
 )
 import re
+import json
+from uuid import UUID
 from parking_system.db_dao import get_db
 from parking_system.auth import login_required
 
@@ -17,13 +21,14 @@ blueprint = Blueprint("users", __name__, url_prefix="/users")
 
 
 @blueprint.route("/register-car", methods=(["GET", "POST"]))
+@login_required
 def register_car():
     if g.user is None:
         owner_id = None
     else:
         owner_id = g.user.owner_id
-    if request.method == "POST":
 
+    if request.method == "POST":
         license_plate = request.form["license_plate"]
         brand_name = request.form["brand_name"]
         fuel_type = request.form["fuel_type"]
@@ -42,15 +47,22 @@ def register_car():
                     "Already registered car with this license plate (%s)."
                     % license_plate
                 )
-
             if error is None:
                 cursor.execute(
                     insert_query,
                     (license_plate, owner_id, brand_name, fuel_type),
                 )
                 connection_object.commit()
-                return redirect(url_for("billboard.get_parking_spaces_info"))
-
+                response = {
+                    "message": "Car registered",
+                    "data": {
+                        "owner_id": str(owner_id),
+                        "license_plate": license_plate,
+                        "brand_name": brand_name,
+                        "fuel_type": fuel_type,
+                    },
+                }
+                return make_response(jsonify(response), 201)
         except Error as err:
             connection_object.rollback()
             print("Error Code:", err.errno)
@@ -61,7 +73,7 @@ def register_car():
             if error is not None:
                 flash(error)
 
-    return render_template("auth/register_car.html")
+    return render_template("users/register_car.html")
 
 
 def validate_car_data(license_plate, brand_name, fuel_type):
