@@ -1,3 +1,19 @@
+CREATE USER IF NOT EXISTS 'zernike_parking_app'@'localhost' IDENTIFIED BY 'laYuEkK9JCAmd8Yc';
+CREATE USER IF NOT EXISTS 'billboard'@'localhost' IDENTIFIED BY '3aOzPMneTinxb6tc';
+CREATE USER IF NOT EXISTS 'ticket_booth'@'localhost' IDENTIFIED BY 'mMibUQ8BjKsCn0mx';
+CREATE USER IF NOT EXISTS 'finance_app'@'localhost' IDENTIFIED BY 'ipHfdfYvhVGDAf3g';
+CREATE USER IF NOT EXISTS 'maintanance_app'@'localhost' IDENTIFIED BY 'skqAK4THxblysxRO';
+#
+CREATE ROLE IF NOT EXISTS parking_system_dev, parking_system_read, parking_system_write;
+#
+GRANT ALL ON parking_system.* TO parking_system_dev;
+GRANT SELECT ON parking_system.* TO parking_system_read;
+GRANT INSERT, UPDATE ON parking_system.* TO parking_system_write;
+#
+GRANT parking_system_read, parking_system_write TO zernike_parking_app@localhost, ticket_booth@localhost;
+GRANT parking_system_read TO ticket_booth@localhost, finance_app@localhost, maintanance_app@localhost;
+#
+SET DEFAULT ROLE ALL TO zernike_parking_app@localhost, billboard@localhost, ticket_booth@localhost, finance_app@localhost, maintanance_app@localhost;
 #
 CREATE TABLE IF NOT EXISTS `ParkingLot`(
     `lot_id` BINARY(16) NOT NULL,
@@ -39,8 +55,7 @@ CREATE TABLE IF NOT EXISTS `Car`(
     `brand_name` VARCHAR(20),
     `fuel_type` VARCHAR(10),
     PRIMARY KEY(`license_plate`),
-    CONSTRAINT
-    FOREIGN KEY(`owner_id`) REFERENCES CarOwner(`owner_id`) ON UPDATE CASCADE ON DELETE SET NULL
+    CONSTRAINT FOREIGN KEY(`owner_id`) REFERENCES CarOwner(`owner_id`) ON UPDATE CASCADE ON DELETE SET NULL
 );
 #
 CREATE TABLE IF NOT EXISTS `CarRecord`(

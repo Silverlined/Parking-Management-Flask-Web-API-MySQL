@@ -85,6 +85,7 @@ def register():
 def login():
     if request.method == "POST":
         email = request.form["email"]
+        print(email)
         password = request.form["password"]
         connection_object = get_db("zernike_parking_app")
         error = None
@@ -95,12 +96,14 @@ def login():
         try:
             cursor.execute(verify_email_query, (email,))
             email_is_registered = cursor.fetchone().is_registered
-            cursor.execute(get_pass_hash_query, (email,))
-            password_hash = cursor.fetchone().password
+
             if email_is_registered == 0:
                 error = "Incorrect email address."
-            elif not sha256_crypt.verify(password, password_hash):
-                error = "Incorrect password."
+            else:
+                cursor.execute(get_pass_hash_query, (email,))
+                password_hash = cursor.fetchone().password
+                if not sha256_crypt.verify(password, password_hash):
+                    error = "Incorrect password."
 
             if error is None:
                 cursor.execute(
@@ -147,7 +150,7 @@ def load_logged_in_user():
             cursor.close()
 
 
-@blueprint.route("/logout")
+@blueprint.route("/logout", methods=(["GET"]))
 def logout():
     # session.clear()
     [session.pop(key) for key in list(session.keys()) if key != "_flashes"]

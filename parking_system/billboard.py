@@ -3,7 +3,7 @@ from flask import Blueprint, flash, render_template, request, url_for
 from parking_system.db_dao import get_db
 
 
-blueprint = Blueprint("billboard", __name__, url_prefix="/billboard")
+blueprint = Blueprint("billboard", __name__, url_prefix="/api/v1/billboard")
 
 
 @blueprint.route("/info", methods=(["GET"]))
