@@ -3,6 +3,7 @@ from flask import current_app, g
 from flask.cli import with_appcontext
 from mysql.connector import MySQLConnection, Error
 from json import load
+from collections import namedtuple
 
 
 def read_db_config(filename="dbconfig.json"):
@@ -67,3 +68,55 @@ def create_tables_command():
             cursor.close()
 
     click.echo("Initialized the database. Create Tables.")
+
+
+@click.command("populate-tables")
+@with_appcontext
+def populate_tables_command():
+    """Flask CLI command to populate the parking system tables with data."""
+
+    connection_object = get_db("admin")
+    select_parking_lot_capacity = """SELECT capacity_all, capacity_charging from ParkingLot WHERE name = "Zernike P7" """
+    insert_parking_spaces = """
+                                INSERT INTO ParkingSpace(space_id, lot_id, space_type, sensor_id, is_occupied, hourly_tariff) 
+                                    VALUES (%s, (SELECT lot_id FROM ParkingLot LIMIT 1), %s, %s, 0, %s)
+                            """
+    insert_parking_lot = """INSERT INTO `ParkingLot`(`lot_id`, `name`, `location`, `capacity_all`, `capacity_charging`) VALUES (UUID_TO_BIN(UUID()), "Zernike P7", "Nettelbosje 2, 9747 AD Groningen", 60, 10)"""
+    cursor = connection_object.cursor(named_tuple=True)
+
+    try:
+        cursor.execute(insert_parking_lot)
+        cursor.execute(select_parking_lot_capacity)
+        row = cursor.fetchone()
+        capacity_all = row.capacity_all
+        capacity_charging = row.capacity_charging
+        ParkingSpace = namedtuple(
+            "ParkingSpace", "space_id space_type sensor_id hourly_tariff"
+        )
+        for i in range(capacity_all):
+            if i < capacity_all - capacity_charging:
+                space_data = ParkingSpace(
+                    space_id=i,
+                    space_type="non_charging",
+                    sensor_id=i,
+                    hourly_tariff=1.20,
+                )
+                cursor.execute(insert_parking_spaces, space_data)
+            else:
+                space_data = ParkingSpace(
+                    space_id=i,
+                    space_type="charging",
+                    sensor_id=i,
+                    hourly_tariff=1.32,
+                )
+                cursor.execute(insert_parking_spaces, space_data)
+        print("Executed")
+        connection_object.commit()
+    except Error as err:
+        connection_object.rollback()
+        print("Error Code:", err.errno)
+        print("SQLSTATE:", err.sqlstate)
+        print("Message:", err.msg)
+    finally:
+        cursor.close()
+    click.echo("Populated the database.")

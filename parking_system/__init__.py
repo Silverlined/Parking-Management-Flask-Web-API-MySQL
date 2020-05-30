@@ -17,6 +17,7 @@ def init_app(app):
     app.teardown_appcontext(db_dao.close_db)
     # Adds a new command that can be called with the flask CLI command.
     app.cli.add_command(db_dao.create_tables_command)
+    app.cli.add_command(db_dao.populate_tables_command)
 
 
 def create_app():
