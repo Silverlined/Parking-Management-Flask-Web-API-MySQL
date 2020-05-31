@@ -71,3 +71,8 @@ GET http://localhost:5000/api/v1/maintenance/overview-cars?group-by=day HTTP/1.1
 
 ### Get overview of amount of cars grouped by
 GET http://localhost:5000/api/v1/finance/list-cars?start-date=2020-05-14%2012:00:00&end-date=2020-05-31%2012:00:00 HTTP/1.1
+
+### Get montly invoice of a car owner
+GET  http://localhost:5000/api/v1/finance/invoice/test%40gmail%2Ecom/May HTTP/1.1
+### Get unpaid records
+GET  http://localhost:5000/api/v1/finance/unpaid HTTP/1.1
