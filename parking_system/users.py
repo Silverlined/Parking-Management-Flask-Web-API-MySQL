@@ -9,6 +9,7 @@ from flask import (
     redirect,
     make_response,
     jsonify,
+    abort,
 )
 import re
 import json
@@ -123,26 +124,27 @@ def get_invoice():
     try:
         cursor.execute(select_query, (owner_id, month))
         rows = cursor.fetchall()
-        data = [
-            {
-                "license_plate": row.license_plate,
-                "check_in": row.check_in,
-                "check_out": row.check_out,
-                "total_time": str(row.total_time),
-                "parking_cost": str(row.parking_cost),
-            }
-            for index, row in enumerate(rows)
-        ]
+        # Old way of extracrting data from the query result
+        # test_data = [
+        #     {
+        #         "license_plate": row.license_plate,
+        #         "check_in": row.check_in,
+        #         "check_out": row.check_out,
+        #         "total_time": str(row.total_time),
+        #         "parking_cost": str(row.parking_cost),
+        #     }
+        #     for index, row in enumerate(rows)
+        # ]
+        ### New way utilizes list comprehension
         data = {}
-        invoice = {}
         for index, row in enumerate(rows):
+            invoice = {}
             for j in [{i[0]: str(i[1])} for i in list(row._asdict().items())]:
                 invoice.update(j)
             data.update({index: invoice})
-            invoice = {}
+
         response = {
             "message": "User invoice for month %s" % month_name[int(month)],
-            # "data": data
             "data": data,
         }
         return make_response(jsonify(response), 200)

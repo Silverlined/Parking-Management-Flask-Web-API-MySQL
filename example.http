@@ -63,5 +63,8 @@ GET http://localhost:5000/api/v1/users/invoice?month={{month}} HTTP/1.1
 GET http://localhost:5000/api/v1/maintenance/sensor-alert HTTP/1.1
 
 ### List currently parked cars
-@with_owner=0
+@with_owner=1
 GET http://localhost:5000/api/v1/maintenance/list-cars?with-owner={{with_owner}} HTTP/1.1
+
+### Get overview of amount of cars grouped by
+GET http://localhost:5000/api/v1/maintenance/overview-cars?group-by=day HTTP/1.1

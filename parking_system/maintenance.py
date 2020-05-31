@@ -9,6 +9,7 @@ from flask import (
     redirect,
     make_response,
     jsonify,
+    abort,
 )
 import re
 import json
@@ -78,28 +79,12 @@ def get_currently_parked_cars():
     try:
         cursor.execute(select_query)
         rows = cursor.fetchall()
-        if with_owner == "1":
-            data = [
-                {
-                    "license_plate": row.license_plate,
-                    "brand_name": row.brand_name,
-                    "first_name": row.first_name,
-                    "surname": row.surname,
-                    "space_id": row.space_id,
-                    "check_in": row.check_in,
-                    "discount_rate": str(row.discount_rate),
-                }
-                for index, row in enumerate(rows)
-            ]
-        else:
-            data = [
-                {
-                    "license_plate": row.license_plate,
-                    "brand_name": row.brand_name,
-                    "fuel_type": row.fuel_type,
-                }
-                for index, row in enumerate(rows)
-            ]
+        data = {}
+        for index, row in enumerate(rows):
+            invoice = {}
+            for j in [{i[0]: str(i[1])} for i in list(row._asdict().items())]:
+                invoice.update(j)
+            data.update({index: invoice})
         response = {
             "message": "List of all the cars parked at the moment",
             "data": data,
@@ -114,13 +99,10 @@ def get_currently_parked_cars():
 
 
 @blueprint.route("/overview-cars", methods=(["GET"]))
-def overview_amount_cars(self, grouped_by):
-    """ 
-    The parameter - grouped_by, must specify whether the function should return the amount of parked card per Hour, Day, Week, or Year:
-    grouped_by = ["hour", "day", "week", "year"]
-    """
-
+def overview_amount_cars():
+    grouped_by = request.args.get("group-by")
     connection_object = get_db("maintenance_app")
+    select_query = None
     if grouped_by == "hour":
         select_query = """SELECT YEAR(check_in) AS year, MONTH(check_in) AS month, DAY(check_in) AS day, HOUR(check_in) AS hour, COUNT(*) AS n_cars 
                             FROM CarRecord GROUP BY year, month, day, hour ORDER BY year, month, day, hour ASC"""
@@ -136,21 +118,24 @@ def overview_amount_cars(self, grouped_by):
 
     cursor = connection_object.cursor(named_tuple=True)
     try:
-        cursor.execute(select_query)
-        rows = cursor.fetchall()
-        data = [
-            {
-                "license_plate": row.license_plate,
-                "brand_name": row.brand_name,
-                "fuel_type": row.fuel_type,
+        if select_query is not None:
+            cursor.execute(select_query)
+            rows = cursor.fetchall()
+            data = {}
+            for index, row in enumerate(rows):
+                invoice = {}
+                for j in [
+                    {i[0]: str(i[1])} for i in list(row._asdict().items())
+                ]:
+                    invoice.update(j)
+                data.update({index: invoice})
+            response = {
+                "message": "List of all the cars parked at the moment",
+                "data": data,
             }
-            for index, row in enumerate(rows)
-        ]
-        response = {
-            "message": "List of all the cars parked at the moment",
-            "data": data,
-        }
-        return make_response(jsonify(response), 200)
+            return make_response(jsonify(response), 200)
+        else:
+            abort(404)
     except Error as err:
         print("Error Code:", err.errno)
         print("SQLSTATE:", err.sqlstate)
