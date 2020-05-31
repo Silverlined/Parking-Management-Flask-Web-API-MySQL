@@ -6,6 +6,7 @@ from parking_system import (
     billboard,
     ticket_booth,
     maintenance,
+    finance,
     db_dao,
 )
 from markdown import markdown
@@ -20,6 +21,7 @@ def init_app(app):
     app.register_blueprint(ticket_booth.blueprint)
     app.register_blueprint(billboard.blueprint)
     app.register_blueprint(maintenance.blueprint)
+    app.register_blueprint(finance.blueprint)
 
     # Tells Flask to call that function when cleaning up after returning the response.
     app.teardown_appcontext(db_dao.close_db)

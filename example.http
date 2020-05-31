@@ -68,3 +68,6 @@ GET http://localhost:5000/api/v1/maintenance/list-cars?with-owner={{with_owner}}
 
 ### Get overview of amount of cars grouped by
 GET http://localhost:5000/api/v1/maintenance/overview-cars?group-by=day HTTP/1.1
+
+### Get overview of amount of cars grouped by
+GET http://localhost:5000/api/v1/finance/list-cars?start-date=2020-05-14%2012:00:00&end-date=2020-05-31%2012:00:00 HTTP/1.1

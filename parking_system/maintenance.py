@@ -1,23 +1,6 @@
 from mysql.connector import MySQLConnection, Error
-from flask import (
-    Blueprint,
-    flash,
-    render_template,
-    request,
-    url_for,
-    g,
-    redirect,
-    make_response,
-    jsonify,
-    abort,
-)
-import re
-import json
-from uuid import UUID
+from flask import Blueprint, request, url_for, make_response, jsonify, abort
 from parking_system.db_dao import get_db
-from parking_system.auth import login_required
-from calendar import month_name
-
 
 blueprint = Blueprint("maintenance", __name__, url_prefix="/api/v1/maintenance")
 
