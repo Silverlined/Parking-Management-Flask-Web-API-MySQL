@@ -1,6 +1,13 @@
 from os import makedirs
 from flask import Flask
-from parking_system import auth, users, billboard, ticket_booth, db_dao
+from parking_system import (
+    auth,
+    users,
+    billboard,
+    ticket_booth,
+    maintenance,
+    db_dao,
+)
 from markdown import markdown
 import os
 
@@ -12,6 +19,7 @@ def init_app(app):
     app.register_blueprint(users.blueprint)
     app.register_blueprint(ticket_booth.blueprint)
     app.register_blueprint(billboard.blueprint)
+    app.register_blueprint(maintenance.blueprint)
 
     # Tells Flask to call that function when cleaning up after returning the response.
     app.teardown_appcontext(db_dao.close_db)

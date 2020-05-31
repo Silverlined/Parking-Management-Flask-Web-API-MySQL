@@ -2,7 +2,8 @@
 GET http://localhost:5000/ HTTP/1.1
 
 ### Show billboard information - available/occuppied space
-GET http://localhost:5000/api/v1/billboard/info?is_occupied=0 HTTP/1.1
+@is_occupied=0
+GET http://localhost:5000/api/v1/billboard/info?is_occupied={{is_occupied}} HTTP/1.1
 
 ### Register a car without an owner
 POST http://localhost:5000/api/v1/ticket-booth/register-car HTTP/1.1
@@ -55,4 +56,12 @@ email=test@gmail.com
 GET http://localhost:5000/auth/logout HTTP/1.1
 
 ### Get user invoice for a specified month
-GET http://localhost:5000/api/v1/users/invoice?month=5 HTTP/1.1
+@month=5
+GET http://localhost:5000/api/v1/users/invoice?month={{month}} HTTP/1.1
+
+### Check sensor alert
+GET http://localhost:5000/api/v1/maintenance/sensor-alert HTTP/1.1
+
+### List currently parked cars
+@with_owner=0
+GET http://localhost:5000/api/v1/maintenance/list-cars?with-owner={{with_owner}} HTTP/1.1

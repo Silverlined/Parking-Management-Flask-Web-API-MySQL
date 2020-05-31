@@ -133,25 +133,19 @@ def get_invoice():
             }
             for index, row in enumerate(rows)
         ]
-        # for index, row in enumerate(data):
-        # data.setdefault(index, []).append(row)
-        # result.insert(
-        #     index,
-        #     [
-        #         owner_id,
-        #         row.license_plate,
-        #         row.check_in,
-        #         row.check_out,
-        #         row.total_time,
-        #         row.parking_cost,
-        #     ],
-        # )
+        data = {}
+        invoice = {}
+        for index, row in enumerate(rows):
+            for j in [{i[0]: str(i[1])} for i in list(row._asdict().items())]:
+                invoice.update(j)
+            data.update({index: invoice})
+            invoice = {}
         response = {
-            "message": "User invoice for month %s"
-            % month_name[int(month)],
+            "message": "User invoice for month %s" % month_name[int(month)],
+            # "data": data
             "data": data,
         }
-        return make_response(jsonify(response), 201)
+        return make_response(jsonify(response), 200)
     except Error as err:
         print("Error Code:", err.errno)
         print("SQLSTATE:", err.sqlstate)

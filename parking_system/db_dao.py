@@ -45,6 +45,7 @@ def close_db(e=None):
 
     if db_connection is not None:
         db_connection.close()
+        print("Connection: Closed")
 
 
 @click.command("create-tables")
