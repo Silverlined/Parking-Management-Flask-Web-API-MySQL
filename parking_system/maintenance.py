@@ -32,6 +32,7 @@ def sensor_alert():
         print("Message:", err.msg)
     finally:
         cursor.close()
+    abort(500)
 
 
 @blueprint.route("/list-cars", methods=(["GET"]))
@@ -79,6 +80,7 @@ def get_currently_parked_cars():
         print("Message:", err.msg)
     finally:
         cursor.close()
+    abort(500)
 
 
 @blueprint.route("/overview-cars", methods=(["GET"]))
@@ -125,3 +127,4 @@ def overview_amount_cars():
         print("Message:", err.msg)
     finally:
         cursor.close()
+    abort(500)

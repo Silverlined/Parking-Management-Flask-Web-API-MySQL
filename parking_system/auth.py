@@ -20,9 +20,27 @@ blueprint = Blueprint("auth", __name__, url_prefix="/auth")
 
 @blueprint.route("/register", methods=(["GET", "POST"]))
 def register():
-    if request.method == "GET":
-        return render_template("auth/register.html")
-    elif request.method == "POST":
+    """Registers a new car owner in the database
+
+        GET:
+            responses:
+                200 OK on success,
+                404 Not Found
+        POST:
+            parameters:
+                email: str
+                password: str
+                customer_type: str
+                student_employee_code: str
+                first_name: str
+                surname: str
+                tel_number: str
+                payment_method: str
+            responses:
+                201 Created on success
+    """
+
+    if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
         customer_type = request.form["customer_type"]
@@ -68,8 +86,7 @@ def register():
                     ),
                 )
                 connection_object.commit()
-                return redirect(url_for("billboard.info"))
-
+                return redirect(url_for("billboard.info"), code=201)
         except Error as err:
             connection_object.rollback()
             print("Error Code:", err.errno)
@@ -79,10 +96,25 @@ def register():
             cursor.close()
             if error is not None:
                 flash(error)
+    return render_template("auth/register.html")
 
 
 @blueprint.route("/login", methods=(["GET", "POST"]))
 def login():
+    """Login as a car owner
+
+        GET:
+            responses:
+                200 OK on success,
+                404 Not Found
+        POST:
+            parameters:
+                email: str
+                password: str
+            responses:
+                204 No Content on success
+    """
+
     if request.method == "POST":
         email = request.form["email"]
         print(email)
@@ -113,7 +145,9 @@ def login():
                 user_id = cursor.fetchone().owner_id
                 session.clear()
                 session["user_id"] = user_id
-                return redirect(url_for("billboard.get_parking_spaces_info"))
+                return redirect(
+                    url_for("billboard.get_parking_spaces_info"), code=204
+                )
 
         except Error as err:
             connection_object.rollback()

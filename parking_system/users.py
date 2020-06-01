@@ -154,6 +154,7 @@ def get_invoice():
         print("Message:", err.msg)
     finally:
         cursor.close()
+    abort(500)
 
 
 def validate_car_data(license_plate, brand_name, fuel_type):

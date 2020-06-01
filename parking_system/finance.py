@@ -13,6 +13,7 @@ from calendar import month_name
 from parking_system.db_dao import get_db
 from parking_system import maintenance
 from calendar import month_name
+from datetime import datetime
 
 blueprint = Blueprint("finance", __name__, url_prefix="/api/v1/finance")
 
@@ -56,7 +57,92 @@ def get_cars_date_range():
         cursor.close()
 
 
-@blueprint.route("/invoice/<email>/<month>")
+@blueprint.route("/invoice/all", methods=(["GET"]))
+def get_monthly_invoices_per_owner():
+    connection_object = get_db("finance_app")
+    cursor = connection_object.cursor(named_tuple=True)
+    select_query = """SELECT
+                            owner_id,
+                            license_plate,
+                            ps.space_id,
+                            check_in,
+                            check_out,
+                            total_time,
+                            total_time * ps.hourly_tariff AS parking_cost,
+                            is_paid
+                        FROM
+                            (
+                            SELECT
+                                co.owner_id,
+                                co.license_plate,
+                                r.check_in,
+                                r.check_out,
+                                ROUND(
+                                    (
+                                        TIME_TO_SEC(
+                                            TIMEDIFF(r.check_out, r.check_in)
+                                        ) / 3600
+                                    ),
+                                    2
+                                ) AS total_time,
+                                r.is_paid,
+                                r.space_id
+                            FROM
+                                (
+                                SELECT
+                                    Car.license_plate,
+                                    CarOwner.owner_id,
+                                    CarOwner.first_name,
+                                    CarOwner.surname,
+                                    CarOwner.student_employee_code,
+                                    CarOwner.discount_rate
+                                FROM
+                                    Car
+                                INNER JOIN CarOwner ON Car.owner_id = CarOwner.owner_id
+                            ) co
+                        INNER JOIN CarRecord r ON
+                            co.license_plate = r.license_plate
+                        ) cor
+                        INNER JOIN ParkingSpace ps USING(space_id)"""
+    try:
+        cursor.execute(select_query)
+        data = {}
+        rows = cursor.fetchall()
+        invoices = {}
+        ### Group by month
+        for index, row in enumerate(rows):
+            invoice = {}
+            for j in [{i[0]: str(i[1])} for i in list(row._asdict().items())]:
+                invoice.update(j)
+            invoices.update({index: invoice})
+        for invoice in invoices.values():
+            invoices_groupby_month = {}
+            for index, month in enumerate(month_name):
+                if index != 0:
+                    monthly_invoice = {}
+                    for k, v in invoices.items():
+                        if (
+                            datetime.strptime(
+                                v["check_in"], "%Y-%m-%d %H:%M:%S"
+                            ).month
+                            == index
+                            and v["owner_id"] == invoice["owner_id"]
+                        ):
+                            monthly_invoice.update({k: v})
+                    invoices_groupby_month.update({month: monthly_invoice})
+            data.update({invoice["owner_id"]: invoices_groupby_month})
+        response = {"message": "Monthly invoices per car owner", "data": data}
+        return make_response(jsonify(response), 200)
+    except Error as err:
+        print("Error Code:", err.errno)
+        print("SQLSTATE:", err.sqlstate)
+        print("Message:", err.msg)
+    finally:
+        cursor.close()
+    abort(500)
+
+
+@blueprint.route("/invoice/<email>/<month>", methods=(["GET"]))
 def get_user_invoice(email, month):
     connection_object = get_db("finance_app")
     cursor = connection_object.cursor(named_tuple=True)
@@ -124,13 +210,55 @@ def get_user_invoice(email, month):
         print("Message:", err.msg)
     finally:
         cursor.close()
+    abort(500)
 
 
 @blueprint.route("/unpaid", methods=(["GET"]))
 def get_unpaid_records():
     connection_object = get_db("finance_app")
     cursor = connection_object.cursor(named_tuple=True)
-    select_query = """SELECT * FROM CarRecord WHERE is_paid = 0"""
+    select_query = """SELECT
+                                    record_id,
+                                    license_plate,
+                                    check_in,
+                                    check_out,
+                                    total_time,
+                                    total_time * ps.hourly_tariff AS parking_cost,
+                                    is_paid
+                                FROM
+                                    (
+                                    SELECT
+                                        r.record_id,
+                                        co.license_plate,
+                                        r.check_in,
+                                        r.check_out,
+                                        ROUND(
+                                            (
+                                                TIME_TO_SEC(
+                                                    TIMEDIFF(r.check_out, r.check_in)
+                                                ) / 3600
+                                            ),
+                                            2
+                                        ) AS total_time,
+                                        r.is_paid,
+                                        r.space_id
+                                    FROM
+                                        (
+                                        SELECT
+                                            Car.license_plate,
+                                            CarOwner.owner_id,
+                                            CarOwner.first_name,
+                                            CarOwner.surname,
+                                            CarOwner.student_employee_code,
+                                            CarOwner.discount_rate,
+                                            CarOwner.payment_method
+                                        FROM
+                                            Car
+                                        INNER JOIN CarOwner ON Car.owner_id = CarOwner.owner_id
+                                    ) co
+                                INNER JOIN CarRecord r ON co.license_plate = r.license_plate AND r.is_paid = 0
+                                ) cor
+                                INNER JOIN ParkingSpace ps USING(space_id)"""
 
     try:
         cursor.execute(select_query)
@@ -141,7 +269,7 @@ def get_unpaid_records():
             for j in [{i[0]: str(i[1])} for i in list(row._asdict().items())]:
                 invoice.update(j)
             data.update({index: invoice})
-        response = {"message": "Monthly invoice of a car owner", "data": data}
+        response = {"message": "Unpaid invoices", "data": data}
         return make_response(jsonify(response), 200)
     except Error as err:
         print("Error Code:", err.errno)
@@ -149,3 +277,4 @@ def get_unpaid_records():
         print("Message:", err.msg)
     finally:
         cursor.close()
+    abort(500)

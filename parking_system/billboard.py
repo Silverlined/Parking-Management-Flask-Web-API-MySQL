@@ -1,5 +1,5 @@
 from mysql.connector import MySQLConnection, Error
-from flask import Blueprint, flash, render_template, request, url_for
+from flask import Blueprint, flash, render_template, request, url_for, abort
 from parking_system.db_dao import get_db
 
 
@@ -8,7 +8,7 @@ blueprint = Blueprint("billboard", __name__, url_prefix="/api/v1/billboard")
 
 @blueprint.route("/info", methods=(["GET"]))
 def get_parking_spaces_info():
-    """Gets information about the parking lots in terms of parking spaces
+    """Gives information about the parking lots in terms of parking spaces
 
         Returns
         -------
@@ -56,3 +56,4 @@ def get_parking_spaces_info():
         print("Message:", err.msg)
     finally:
         cursor.close()
+    abort(500)
