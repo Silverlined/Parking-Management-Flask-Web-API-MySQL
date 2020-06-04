@@ -2,16 +2,132 @@
 ## Introduction
 ---
 Zernike Facilities is in the process of building a new parkinglot - P7. P7 will be ticketless and will keep track of which parking places are available/occupied. This inspired management to order the creation of a new parking app and to upgrade the old parking lots to the new system. As a future engineer you receive the order to develop the new system that will manage the parking lots.
-## Development procedure
+
+## Database Structure
 ---
-### 1. Setup the Application
-`The application will be based on the micro web framework - Flask.`
-### 2. Define and Access the Database
+<img src=./parking_system/static/images/erd.png width=640>
+
+- `ParkingLot` table:
+    - `lot_id` column
+        - *data type*: BINARY(16), storing an UUID, SMALLINT is also possible;
+        - *description*: Primary key, to store an unique identifier for each parking lot;
+    - `name` column 
+        - *data type*: VARCHAR(15), variable-length string with limit of 15 characters;
+        - *description*: to store the name of the parking lot (e.g. "Zernike P7");
+    - `location` column 
+    - *data type*: VARCHAR(50), variable-length string with limit of 50 characters;
+        - *description*: to store information about the location of the lot;
+    - `capacity_all` column 
+        - *data type*: SMALLINT UNSIGNED, max. 65535;
+        - *description*: to store the number of all parking spaces (*charing + non-charging*) at the parking lot;
+    - `capacity_electric` column
+        - *data type*: SMALLINT UNSIGNED, max. 65535;
+        - *description*: to store the number of *charging* parking spaces at the parking lot;
+- `ParkingSpace` table:
+    - `space_id` column
+        - *data type*: SMALLINT UNSIGNED, max. 65535;
+        - *description*: Primary key, to store an unique identifier for each parking space/spot;
+    - `lot_id` column 
+        - *data type*: BINARY(16), storing an UUID;
+        - *description*: Foreign key, referring to an instance of the "parent" table, specifying to which parking lot does this space belong to;
+    - `space_type` column
+        - *data type*: VARCHAR(15), variable-length string with limit of 15 characters;
+        - *description*: to store information about the type of the parking space (*charing/non-chargin*);
+    - `sensor_id` column
+        - *data type*: SMALLINT UNSIGNED, max. 65535;
+        - *description*: if sensor is present, to uniquely identify which one is attached to the parking space;
+    - `is_occupied` column
+        - *data type*: BIT, either 0 or 1;
+        - *description*: Binary number (0 or 1) to represent the current state (either free or occupied) of the parking space;
+    - `hourly_tariff` column
+        -  *data type*: DECIMAL(3,2), efficient way to store numbers representing monetary value;
+        - *description*: to specify the parking fee of the space per hour;
+- `CarRecord` table:
+(a record stores infomation about a single visit of a car to the parking lot, i.e. history)
+    - `record_id` column 
+        - *data type*: BINARY(16), storing an UUID, INT or BIGINT is also possible;
+        - *description*: Primary key, to store an unique indentifier for each record;
+    - `license_plate` column
+        - *data type*: VARCHAR(10), variable-length string with limit of 10 characters. License plates are usually not longer than 10 characters;
+        - *description*: Foreign key, referring to an instance of the Car table, specifying to which car does this record belong to;
+    - `space_id` column
+        - *data type*: SMALLINT UNSIGNED, max. 65535;
+        - *description*: Foreign key, referring to an instance of the ParkingSpace table, specifying based on which parking space was this record created (i.e. where was the car parked during this visit/record);
+    - `check_in` column
+        - *data type*: DATETIME;
+        - *description*: to store information about the check-in time of the car;
+    - `check_out` column
+        - *data type*: DATETIME;
+        - *description*: to store information about the check-out time of the car;
+    - `is_paid` column
+        - *data type*: BIT, either 0 or 1;
+        - *description*: Binary number (0/1) to specify if the parking visit is paid or not.
+- `Car` table:
+    - `license_plate` column
+        - *data type*: VARCHAR(10), variable-length string with limit of 10 characters. License plates are usually not longer than 10 characters;
+        - *description*: Primary key, to store the license plate information of the car which uniquely identifies it;
+    - `owner_id` column 
+        - *data type*: BINARY(16), UUIDs address security concerns and  prevent guessing of the owner id;
+        - *description*: Foreign key, referring to an instance of the CarOwner table, specifying to which owner does this car belong to;
+    - `brand_name` column
+        - *data type*: VARCHAR(20), variable-length string with limit of 20 characters;
+        - *description*: to store information about the brand of the car;
+    - `fuel_type` column
+        - *data type*: VARCHAR(10), variable-length string with limit of 10 characters;
+        - *description*: to store information about the fuel type of the car;
+- `CarOwner` table;
+    - `owner_id` column 
+        - *data type*: BINARY(16), UUIDs address security concerns and  prevent guessing of the owner id;
+        - *description*: Primary key, to store an unique identifier for each owner;
+    - `customer_type` column
+        - *data type*: VARCHAR(10), variable-length string with limit of 10 characters (Student/Hanze/RUG);
+        - *description*: to store infomation about the relation the owner has to the parking lot, e.g. working at Hanze UAS or RUG, or beign a student;
+    - `student_employee_code` column
+        - *data type*: CHAR(10), constant-length string with limit of 10 characters, university codes are usually standard and have constant length;
+        - *description*: if available, to store information about the unique code related to the universities;  
+    - `discount_rate` column
+        -  *data type*: DECIMAL(4,2), efficient way to store numbers representing percentage value;
+        - *description*: to store information about the discount the owner receives for his parking records;
+    - `first_name` column
+        - *data type*: VARCHAR(20), variable-length string with limit of 20 characters;
+        - *description*: to store information about the first name of the owner;
+    - `surname` column
+        - *data type*: VARCHAR(20), variable-length string with limit of 20 characters;
+        - *description*: to store information about the surname of the owner;
+    - `tel_number` column
+        - *data type*: CHAR(10), constant-length string with limit of 10 characters, telephone numbers are usually standard and have constant length;
+        - *description*: to store the telephone number of the owner;
+    - `email` column
+        - *data type*: VARCHAR(30), variable-length string with limit of 30 characters;
+        - *description*: to store the email of the owner;
+    - `password` column
+        - *data type*: CHAR(82), constant-length string with limit of 82 characters, hashing algorithms produces large strings which are difficult to reverse;
+        - *description*: to store a hashed version of the password of the owner, used for login and verification with the app;
+    - `payment_method` column
+        - *data type*: VARCHAR(15), variable-length string with limit of 15 characters (manual/direct debit);
+        - *description*: to store information about the method the owner prefers to pay out his parking cost (via manual payments or direct debit);
+
+#### Different devices connect to the API 
+- `Users` - can login or register and receive information through the Zernike Parking app, thus require SELECT, INSERT, UPDATE privileges (parking_system_read + parking_system_write ROLEs)
+- `Billboard` - should request and receive information about the parking spaces, thus requires SELECT privileges (parking_system_read ROLE)
+- `Ticket booth` - can register visitors and request an overview of the available spaces, thus requires SELECT, INSERT, UPDATE privileges (parking_system_read + parking_system_write ROLEs)
+- `Cameras` - require INSERT, UPDATE privileges to store information about the license plate and the parking spaces of the cars (parking_system_write ROLE)
+- `Sensors` - require UPDATE privileges to store information about the parking spaces, whether they are free or occupied (parking_system_write ROLE)
+- `Finance app` - should request past information about the overall state of the lot, thus requires SELECT privileges (parking_system_read ROLE)
+- `Maintenance app` - should have access to all and thus require complete admin privileges
+
+## Development Process
+---
+### 1. Define and Access the Database
 `The application will use a MySQL database.`
 >Note: I will be using the *MySQL connector/Python* as my database API wrapper. `mysql-connector` is an all-in python module supported by MySQL.
-### 3. Create Blueprints & Views
+### 2. Use Pipenv
+>Pipenv is a tool that creates a virtualenv and manages the project dependencies.
+### 3. Setup the Application
+`The application will be based on the micro web framework - Flask.`
+### 4. Create Blueprints & Views
 >A Blueprint is a way to organize a group of related views and other code. A "view" function is the code you write to respond to requests to your application. Flask uses patterns to match the incoming request URL to the view that should handle it. The view returns data that Flask turns into an outgoing response. Rather than registering views and other code directly with an application, they are collected and registered together with a blueprint. Then the blueprint is registered with the application when it is available in the factory function.
-### 4. Use Templates & Static Files
+### 5. Use Templates & Static Files
 >Templates are files, usually html, that contain static data as well as placeholders for dynamic data. A template is rendered with specific data to produce a final document. Flask uses the Jinja template library to render templates.
 
 ## Usage
