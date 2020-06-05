@@ -2,7 +2,7 @@
 GET http://localhost:5000/ HTTP/1.1
 
 ### Show billboard information - available/occuppied space
-@is_occupied=0
+@is_occupied=1
 GET http://localhost:5000/api/v1/billboard/info?is_occupied={{is_occupied}} HTTP/1.1
 
 ### Register a car without an owner
@@ -67,10 +67,10 @@ GET http://localhost:5000/api/v1/maintenance/sensor-alert HTTP/1.1
 GET http://localhost:5000/api/v1/maintenance/list-cars?with-owner={{with_owner}} HTTP/1.1
 
 ### Overview of amount of cars grouped by
-GET http://localhost:5000/api/v1/maintenance/overview-cars?group-by=day HTTP/1.1
+GET http://localhost:5000/api/v1/maintenance/overview-cars?group-by=year HTTP/1.1
 
 ### Overview of cars from starting_date until end_date
-GET http://localhost:5000/api/v1/finance/list-cars?start-date=2020-05-14%2012:00:00&end-date=2020-05-31%2012:00:00 HTTP/1.1
+GET http://localhost:5000/api/v1/finance/list-cars?start-date=2020-05-14%2012:00:00&end-date=2020-06-05%2012:00:00 HTTP/1.1
 
 ### Monthly invoice of a car owner
 GET  http://localhost:5000/api/v1/finance/invoice/test%40gmail%2Ecom/May HTTP/1.1

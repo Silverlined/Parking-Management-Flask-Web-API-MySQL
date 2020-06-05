@@ -86,7 +86,7 @@ def register():
                     ),
                 )
                 connection_object.commit()
-                return redirect(url_for("billboard.info"), code=201)
+                return redirect(url_for("auth.login"), code=201)
         except Error as err:
             connection_object.rollback()
             print("Error Code:", err.errno)
@@ -117,7 +117,6 @@ def login():
 
     if request.method == "POST":
         email = request.form["email"]
-        print(email)
         password = request.form["password"]
         connection_object = get_db("zernike_parking_app")
         error = None
