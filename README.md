@@ -3,7 +3,7 @@
 ---
 Zernike Facilities is in the process of building a new parkinglot - P7. P7 will be ticketless and will keep track of which parking places are available/occupied. This inspired management to order the creation of a new parking app and to upgrade the old parking lots to the new system. As a future engineer you receive the order to develop the new system that will manage the parking lots.
 
-## Database Structure
+## Database Structure (ERD)
 ---
 <img src=./parking_system/static/images/erd.png width=640>
 
